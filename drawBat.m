@@ -3,8 +3,13 @@
 % lowerwing: (0, -2size, 1), (0,0,1), (size,-size,1), (size/2, -size, 1)
 
 % create function batHandle
-function batHandle = drawBat(batSize, batColor, width, batPose,x,y)
+function batHandle = drawBat(batSize, batColor, width, batPose,x,y,rot,thet)
   bat = getBat(batSize,batPose);
+
+  if rot
+    R = getRotate(thet);
+    bat = R*bat;
+  endif
 
   T = getTranslate(x,y)
   bat = T*bat;

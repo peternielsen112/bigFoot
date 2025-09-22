@@ -1,5 +1,5 @@
 function bat = getBat(batSize, batPose)
-  bat = zeros(3,10);
+  bat = zeros(3,15);
   if (batPose == 0)
     bat(:,1)=[0;0;1];
     bat(:,2)=[batSize/2;batSize/3;1];
