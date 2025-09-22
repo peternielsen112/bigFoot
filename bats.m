@@ -15,6 +15,7 @@ function bats (frames)
 
   [imageHeight,imageWidth] = drawBackground("spookyForest.png");
 
+  usedframes = 1;
 
   rcheck = true;
   thet = (-pi/2);
