@@ -1,11 +1,15 @@
 
 % create function bigFootHandle
-function bigFootHandle = drawBigFoot(bigFootSize,bigFootPose,bigFootColor)
+function bigFootHandle = drawBigFoot(bigFootSize,bigFootPose,bigFootColor,x,y)
   bigFoot = getBigFoot(bigFootSize,bigFootPose);
 
+  R = getRotate(pi);
+  bigFoot = R*bigFoot;
 
-%  T = getTranslate(x,y)
-%  bigFoot = T*bigFoot;
+  T = getTranslate(x,y);
+  bigFoot = T*bigFoot;
+
+
 
   p1=bigFoot(:,1);
   p2=bigFoot(:,2);
@@ -31,7 +35,7 @@ function bigFootHandle = drawBigFoot(bigFootSize,bigFootPose,bigFootColor)
   handle1 = drawFilledCircle(p1(1),p1(2),bigFootSize,bigFootColor,2);
 
   % create face
-  handle2 = drawCircle(p2(1),p2(2),bigFootSize/2,bigFootColor,2);
+  handle2 = drawFilledCircle(p2(1),p2(2),bigFootSize/2,bigFootColor,2);
 
   % fill arm1
   hold on

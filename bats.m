@@ -1,5 +1,4 @@
 function bats (frames)
-
   fps = 2;
 
   dt = 1/fps;
@@ -12,6 +11,10 @@ function bats (frames)
   batY = 200;
   batSpeed = 50;
   batAngularSpeed = pi/2; % radians/sec
+
+  bigFootX = 750;
+  bigFootY = 750;
+  bigFootPose = 0;
 
   [imageHeight,imageWidth] = drawBackground("spookyForest.png");
 
@@ -40,10 +43,13 @@ function bats (frames)
       batX=batX + batSpeed;
       batY=batY + batSpeed;
     endif
-    batPose = mod(i,2)
+    batPose = mod(i,2);
+    bigFootPose = mod(i,2)
     batHandle = drawBat(batSize,batColor,lineWidth,batPose,batX,batY,rcheck,thet);
+    bigFootHandle = drawBigFoot(batSize,bigFootPose,"red",bigFootX,bigFootY);
     pause(dt);
     delete(batHandle);
+    delete(bigFootHandle);
     usedframes = usedframes + 1;
   endfor
 endfunction

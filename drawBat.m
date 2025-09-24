@@ -11,7 +11,7 @@ function batHandle = drawBat(batSize, batColor, width, batPose,x,y,rot,thet)
     bat = R*bat;
   endif
 
-  T = getTranslate(x,y)
+  T = getTranslate(x,y);
   bat = T*bat;
 
   p1=bat(:,1);
