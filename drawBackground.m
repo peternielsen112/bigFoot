@@ -18,5 +18,7 @@ function [imageHeight,imageWidth] = drawBackground (imageName)
   set(gca, "position", [0 0 1 1]);  % make the axes fill the figure
   set(gcf, "units", "normalized", "outerposition", [0 0 1 1]);
 
+  set(gcf,'KeyPressFcn', @(src,event)keyPress(src,event));
+
 endfunction
 
