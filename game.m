@@ -1,4 +1,4 @@
-function game (frames)
+function game
 
   global cmd;
   cmd = "null";
@@ -10,7 +10,7 @@ function game (frames)
   batSize = 40;
   batColor = [0.2, 0, 0.8];
   lineWidth = 3;
-
+  frames = 0;
   batX = 750;
   batY = 200;
   batSpeed = 25;
@@ -28,7 +28,7 @@ function game (frames)
   rcheck = true;
   thet = (-pi/2);
 
-  for i=1:frames
+  while (cmd != 'q')
     thet = thet + batAngularSpeed*dt;
     if (batX >= 1400)
       batX=batX - (2 * (rand > 0.5)*batSpeed);
@@ -59,23 +59,23 @@ function game (frames)
     if (cmd == "w")
       bigFootY -= bigFootSpeed;
       cmd = "null";
-      bigFootPose = mod(i,2);
+      bigFootPose = mod(frames,2);
     elseif (cmd == "s")
       bigFootY += bigFootSpeed;
       cmd = "null";
-      bigFootPose = mod(i,2);
+      bigFootPose = mod(frames,2);
     elseif (cmd == "a")
       bigFootX -= bigFootSpeed;
       cmd = "null";
-      bigFootPose = mod(i,2);
+      bigFootPose = mod(frames,2);
     elseif (cmd == "d")
       bigFootX += bigFootSpeed;
       cmd = "null";
-      bigFootPose = mod(i,2);
+      bigFootPose = mod(frames,2);
     else
       cmd = "null";
     endif
-    batPose = mod(i,2);
+    batPose = mod(frames,2);
  %   bigFootPose = mod(i,2);
     batHandle = drawBat(batSize,batColor,lineWidth,batPose,batX,batY,rcheck,thet);
     bigFootHandle = drawBigFoot(batSize,bigFootPose,"red",bigFootX,bigFootY);
@@ -83,6 +83,7 @@ function game (frames)
     delete(batHandle);
     delete(bigFootHandle);
     usedframes = usedframes + 1;
-  endfor
+    frames = frames + 1;
+  endwhile
 endfunction
 
