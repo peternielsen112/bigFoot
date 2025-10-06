@@ -15,4 +15,4 @@ This program runs (rather annoyingly) in Octave (file extension .m). To edit fil
 
 ---
 ### To Run
-To run this program, either run the Octave GUI or run Octave from your command line, then run the command `game(100000)`. You may replace this number with the number of frames you wish the game to run; when this number of frames has been reached, the game will end.
+To run this program, either run the Octave GUI or run Octave from your command line, then run the command `game`.
