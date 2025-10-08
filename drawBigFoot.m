@@ -1,9 +1,9 @@
 
 % create function bigFootHandle
-function bigFootHandle = drawBigFoot(bigFootSize,bigFootPose,bigFootColor,x,y)
+function bigFootHandle = drawBigFoot(bigFootSize,bigFootPose,bigFootColor,x,y,thet)
   bigFoot = getBigFoot(bigFootSize,bigFootPose);
 
-  R = getRotate(pi);
+  R = getRotate(pi+thet);
   bigFoot = R*bigFoot;
 
   T = getTranslate(x,y);
