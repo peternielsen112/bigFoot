@@ -27,6 +27,20 @@ function game
   bigFootTheta = pi/6;
   bfThet = 0;
 
+
+  bigFootOnGround = 1;
+  bigFootFalling = 0;
+
+
+  climbRoute1 = 475;
+  climbRoute2 = 1270;
+  climbRouteRadius = 50;
+  climbRouteMaxHeight = 4*batSize;
+
+%  [signal, sampleRate] = audioread('spooky_forest_bat.wav');
+%  player = audioplayer(signal,sampleRate);
+%  play(player);
+
 % background/scene change init
   [imageHeight,imageWidth] = drawBackground("spookyForest.png");
   change = false;
@@ -38,6 +52,38 @@ function game
 
 % main loop. k to quit while running
   while (cmd != 'k')
+
+%    if (!isplaying(player))
+%      stop(player);
+%      play(player);
+%    endif
+
+    if ((abs(climbRoute1 - bigFootX) < climbRouteRadius || abs(climbRoute2-bigFootX) < climbRouteRadius) && bigFootY > climbRouteMaxHeight)
+      canClimb = 1;
+    else
+      canClimb = 0;
+    endif
+
+    if (bigFootY > 750)
+      bigFootOnGround = 1;
+    else
+      bigFootOnGround = 0;
+    endif
+
+    if (bigFootOnGround)
+      bigFootFalling =0;
+    else
+      bigFootFalling =1;
+    endif
+% make him fall
+    if (bigFootFalling)
+      bigFootFallTime = bigFootFallTime + 1;
+      bigFootY = bigFootY + bigFootFallTime*bigFootFallTime;
+    else
+      bigFootFallTime = 0;
+    endif
+
+
     % check for background change? then change to cave. reset change to false and reset characters.
     if (change == true)
       [imageHeight,imageWidth] = drawBackground("cave.png");
@@ -65,6 +111,18 @@ function game
       batY=batY - (2 * (rand > 0.5)*batSpeed);
     else
       batY=batY + ((2 * (rand > 0.5) - 1)*batSpeed);
+    endif
+
+    if (bigFootY <= 185)
+      bigFootY=bigFootY + (2 * (rand > 0.5)*batSpeed);
+    elseif (bigFootY >= 900)
+      bigFootY=bigFootY - (2 * (rand > 0.5)*batSpeed);
+    endif
+
+    if (bigFootX >= 1400)
+      bigFootX=bigFootX - (2 * (rand > 0.5)*batSpeed);
+    elseif (bigFootX <= 145)
+      bigFootX=bigFootX + (2 * (rand > 0.5)*batSpeed);
     endif
     %OLD IGNORE
 %    batX=batX + ((2 * (rand > 0.5) - 1)*batSpeed);
@@ -100,6 +158,9 @@ function game
       bfThet -= bigFootTheta;
     elseif (cmd == "e")
       bfThet += bigFootTheta;
+    elseif( cmd == 'x' && bigFootOnGround ) %jump vertically
+      bigFootFalling = 1;
+      bigFootY = bigFootY - 10*rand*bigFootSpeed;
     else
       cmd = "null";
     endif
@@ -117,14 +178,8 @@ function game
     usedframes = usedframes + 1;
     frames = frames + 1;
     % check collision for scene change?
-    if (batX <= bigFootX+50)
-      if (batX >=bigFootX-50)
-        if (batY <= bigFootY+50)
-          if (batY >= bigFootY-50)
-            change = true;
-          endif
-        endif
-      endif
+    if (batX <= bigFootX+50) && (batX >=bigFootX-50) && (batY <= bigFootY+50) && (batY >= bigFootY-50)
+      change = true;
     endif
   endwhile
 endfunction
