@@ -32,6 +32,8 @@ function game
   bigFootFalling = 0;
 
 
+  changeTimes = 0;
+
   climbRoute1 = 475;
   climbRoute2 = 1270;
   climbRouteRadius = 50;
@@ -72,6 +74,8 @@ function game
 
     if (bigFootOnGround)
       bigFootFalling =0;
+    elseif (canClimb == 1)
+      bigFootFalling = 0;
     else
       bigFootFalling =1;
     endif
@@ -86,6 +90,11 @@ function game
 
     % check for background change? then change to cave. reset change to false and reset characters.
     if (change == true)
+      if (changeTimes == 2)
+        text(500, 500,"You Won!!!",'FontSize', 50,'Color',[1 0 0]);
+        sleep(5);
+        break;
+      endif
       [imageHeight,imageWidth] = drawBackground("cave.png");
       change = false;
       bigFootX = 750;
@@ -160,7 +169,7 @@ function game
       bfThet += bigFootTheta;
     elseif( cmd == 'x' && bigFootOnGround ) %jump vertically
       bigFootFalling = 1;
-      bigFootY = bigFootY - 10*rand*bigFootSpeed;
+      bigFootY = bigFootY - 40*rand*bigFootSpeed;
     else
       cmd = "null";
     endif
@@ -180,6 +189,7 @@ function game
     % check collision for scene change?
     if (batX <= bigFootX+50) && (batX >=bigFootX-50) && (batY <= bigFootY+50) && (batY >= bigFootY-50)
       change = true;
+      changeTimes += 1;
     endif
   endwhile
 endfunction
