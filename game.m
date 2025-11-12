@@ -27,7 +27,10 @@ function game
   bigFootTheta = pi/6;
   bfThet = 0;
 
+  lastcom = 'null';
 
+
+  
   bigFootOnGround = 1;
   bigFootFalling = 0;
 
@@ -36,6 +39,7 @@ function game
 
   climbRoute1 = 475;
   climbRoute2 = 1270;
+  climbRoute3 = 140;
   climbRouteRadius = 50;
   climbRouteMaxHeight = 4*batSize;
 
@@ -60,7 +64,11 @@ function game
 %      play(player);
 %    endif
 
-    if ((abs(climbRoute1 - bigFootX) < climbRouteRadius || abs(climbRoute2-bigFootX) < climbRouteRadius) && bigFootY > climbRouteMaxHeight)
+    if (abs(climbRoute1 - bigFootX) < climbRouteRadius )
+      canClimb = 1;
+    elseif (abs(climbRoute2 - bigFootX) < climbRouteRadius)
+      canClimb = 1;
+    elseif (abs(climbRoute3 - bigFootX) < climbRouteRadius)
       canClimb = 1;
     else
       canClimb = 0;
@@ -92,7 +100,7 @@ function game
     if (change == true)
       if (changeTimes == 2)
         text(500, 500,"You Won!!!",'FontSize', 50,'Color',[1 0 0]);
-        sleep(5);
+        pause(5);
         break;
       endif
       [imageHeight,imageWidth] = drawBackground("cave.png");
@@ -103,6 +111,10 @@ function game
       bigFootSpeed += 8;
       batX = 750;
       batY = 200;
+      climbRoute1 = 200;
+      climbRoute2 = 1375;
+      climbRoute3 = -500;
+      climbRouteMaxHeight = 420;
     endif
     % bat rotation stuff
     thet = thet + batAngularSpeed*dt;
@@ -156,12 +168,14 @@ function game
       cmd = "null";
       bigFootPose = mod(frames,2);
     elseif (cmd == "a")
+      lastcom = 'a';
       bigFootX -= bigFootSpeed;
       cmd = "null";
       bigFootPose = mod(frames,2);
     elseif (cmd == "d")
       bigFootX += bigFootSpeed;
       cmd = "null";
+      lastcom = 'd';
       bigFootPose = mod(frames,2);
     elseif (cmd == "q")
       bfThet -= bigFootTheta;
@@ -170,6 +184,16 @@ function game
     elseif( cmd == 'x' && bigFootOnGround ) %jump vertically
       bigFootFalling = 1;
       bigFootY = bigFootY - 40*rand*bigFootSpeed;
+    elseif( cmd == 'x' && bigFootOnGround == false ) % leap sideways
+      bigFootFalling = 1;
+      if (lastcom == 'a')
+        bigFootX = bigFootX - 240;
+      elseif (lastcom == 'd')
+        bigFootX = bigFootX + 240;
+      endif
+      bigFootY = bigFootY - rand*bigFootSpeed;
+
+      cmd = "null";
     else
       cmd = "null";
     endif
