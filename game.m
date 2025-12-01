@@ -4,8 +4,10 @@ function game
 % using global variable cmd to connect with keyboard listener
   global cmd;
   cmd = "null";
+% initialize variable to hold most recent keyboard command.
+  lastcom = 'null';
 
-% frames per second. up by powers of 2
+% frames per second. increase or decrease by powers of 2
   fps = 8;
   dt = 1/fps;
 
@@ -13,11 +15,13 @@ function game
   batSize = 40;
   batColor = [0.2, 0, 0.8];
   lineWidth = 3;
-  frames = 0;
   batX = 750;
   batY = 200;
   batSpeed = 25;
-  batAngularSpeed = pi/2; % radians/sec
+  batAngularSpeed = pi/2; % in radians/sec
+
+% init frame number for counting.
+  frames = 0;
 
 % bigfoot init variables
   bigFootX = 750;
@@ -26,17 +30,11 @@ function game
   bigFootSpeed = 15;
   bigFootTheta = pi/6;
   bfThet = 0;
-
-  lastcom = 'null';
-
-
-  
   bigFootOnGround = 1;
   bigFootFalling = 0;
+  bigFootHealth = 100;
 
-
-  changeTimes = 0;
-
+% initialize climbing routes. these will change based on location
   climbRoute1 = 475;
   climbRoute2 = 1270;
   climbRoute3 = 140;
@@ -50,13 +48,14 @@ function game
 % background/scene change init
   [imageHeight,imageWidth] = drawBackground("spookyForest.png");
   change = false;
+  changeTimes = 0;
 
 % frame counter for circular bat rotation; rotation variables
   usedframes = 1;
   rcheck = true;
   thet = (-pi/2);
 
-% main loop. k to quit while running
+% main loop. 'k' to quit while running
   while (cmd != 'k')
 
 %    if (!isplaying(player))
@@ -64,6 +63,7 @@ function game
 %      play(player);
 %    endif
 
+% check climbing, falling potential; change if necessary
     if (abs(climbRoute1 - bigFootX) < climbRouteRadius )
       canClimb = 1;
     elseif (abs(climbRoute2 - bigFootX) < climbRouteRadius)
@@ -87,7 +87,7 @@ function game
     else
       bigFootFalling =1;
     endif
-% make him fall
+% make BigFoot fall if the variables demand it.
     if (bigFootFalling)
       bigFootFallTime = bigFootFallTime + 1;
       bigFootY = bigFootY + bigFootFallTime*bigFootFallTime;
@@ -95,8 +95,7 @@ function game
       bigFootFallTime = 0;
     endif
 
-
-    % check for background change? then change to cave. reset change to false and reset characters.
+% check for background change? if yes change to cave, reset change to false, and reset characters. if already in cave, activate win condition
     if (change == true)
       if (changeTimes == 2)
         text(500, 500,"You Won!!!",'FontSize', 50,'Color',[1 0 0]);
@@ -116,9 +115,11 @@ function game
       climbRoute3 = -500;
       climbRouteMaxHeight = 420;
     endif
-    % bat rotation stuff
+
+% rotate the bat
     thet = thet + batAngularSpeed*dt;
-    % check if bat out of bounds and move bat.
+
+% check if bat out of bounds and move bat randomly.
     if (batX >= 1400)
       batX=batX - (2 * (rand > 0.5)*batSpeed);
     elseif (batX <= 145)
@@ -145,9 +146,7 @@ function game
     elseif (bigFootX <= 145)
       bigFootX=bigFootX + (2 * (rand > 0.5)*batSpeed);
     endif
-    %OLD IGNORE
-%    batX=batX + ((2 * (rand > 0.5) - 1)*batSpeed);
-%    batY=batY + ((2 * (rand > 0.5) - 1)*batSpeed);
+
     if (usedframes >= 5)
       batX=batX - batSpeed;
       batY=batY - batSpeed;
@@ -158,7 +157,7 @@ function game
       batX=batX + batSpeed;
       batY=batY + batSpeed;
     endif
-    % check keyboard cmd (global variable). WASD normal movement; Q/E for rotation.
+% check keyboard cmd (global variable). WASD normal movement; Q/E for rotation.
     if (cmd == "w")
       bigFootY -= bigFootSpeed;
       cmd = "null";
@@ -197,20 +196,20 @@ function game
     else
       cmd = "null";
     endif
-    % change bat pose; draw bat.
+% change bat pose; draw bat.
     batPose = mod(frames,2);
     batHandle = drawBat(batSize,batColor,lineWidth,batPose,batX,batY,rcheck,thet);
-    % draw bigfoot.
+% draw bigfoot.
     bigFootHandle = drawBigFoot(batSize,bigFootPose,"red",bigFootX,bigFootY,bfThet);
-    % break between frames.
+% break between frames.
     pause(dt);
-    % clear characters for next frame.
+% clear characters for next frame.
     delete(batHandle);
     delete(bigFootHandle);
-    % up frame counters
+% up frame counters
     usedframes = usedframes + 1;
     frames = frames + 1;
-    % check collision for scene change?
+% check collision for scene change?
     if (batX <= bigFootX+50) && (batX >=bigFootX-50) && (batY <= bigFootY+50) && (batY >= bigFootY-50)
       change = true;
       changeTimes += 1;
