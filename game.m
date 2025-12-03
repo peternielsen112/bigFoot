@@ -215,5 +215,6 @@ function game
       changeTimes += 1;
     endif
   endwhile
+  clf();
 endfunction
 
