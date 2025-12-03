@@ -1,18 +1,31 @@
 function dragonHandle = drawDragon(dragonSize, dragonColor, x, y, rot, thet)
   
   % Base positions (relative coordinates before transformation)
+  % Sizes for all parts
+  body_radius = dragonSize * 0.8;
+  head_radius = dragonSize * 0.5;
+  tail1_radius = dragonSize * 0.4;
+  tail2_radius = dragonSize * 0.3;
+  eye_radius = dragonSize * 0.12;
+  
   body_x = 0;
   body_y = 0;
-  head_x = dragonSize * 2.5;
-  head_y = dragonSize * 0.8;
-  tail1_x = -dragonSize * 1.2;
-  tail1_y = dragonSize * 0.4;
-  tail2_x = -dragonSize * 2.2;
-  tail2_y = dragonSize * 0.6;
-  eye1_x = head_x + dragonSize * 0.15;
-  eye1_y = head_y + dragonSize * 0.15;
-  eye2_x = head_x + dragonSize * 0.15;
-  eye2_y = head_y - dragonSize * 0.15;
+  
+  % Head positioned to touch body (right side, slightly offset vertically for overlap)
+  head_x = body_radius + head_radius;
+  head_y = 0;
+  
+  % Tail segments connected to body (left side, forming a chain)
+  tail1_x = -(body_radius + tail1_radius);
+  tail1_y = 0;
+  tail2_x = tail1_x - tail1_radius - tail2_radius;
+  tail2_y = dragonSize * 0.3;
+  
+  % Eyes positioned on head surface
+  eye1_x = head_x + head_radius * 0.6;
+  eye1_y = head_y + head_radius * 0.4;
+  eye2_x = head_x + head_radius * 0.6;
+  eye2_y = head_y - head_radius * 0.4;
   
   % Apply rotation if enabled
   if rot

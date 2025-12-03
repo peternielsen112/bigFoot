@@ -11,6 +11,15 @@ function game
   fps = 8;
   dt = 1/fps;
 
+% dragon init variables
+  dragonSize = 50;
+  dragonColor = [0, 0.5, 0];
+  dragonX = 1420;
+  dragonY = 120;
+  dragonRot = true;
+  dragonThet = pi/2; % initial rotation angle
+  dragonPresent = false;
+
 % bat init variables
   batSize = 40;
   batColor = [0.2, 0, 0.8];
@@ -41,9 +50,10 @@ function game
   climbRouteRadius = 50;
   climbRouteMaxHeight = 4*batSize;
 
-%  [signal, sampleRate] = audioread('spooky_forest_bat.wav');
-%  player = audioplayer(signal,sampleRate);
-%  play(player);
+% see if this works - play music!
+  [signal, sampleRate] = audioread('spooky_forest_bat.wav');
+  player = audioplayer(signal,sampleRate);
+  play(player);
 
 % background/scene change init
   [imageHeight,imageWidth] = drawBackground("spookyForest.png");
@@ -58,10 +68,10 @@ function game
 % main loop. 'k' to quit while running
   while (cmd != 'k')
 
-%    if (!isplaying(player))
-%      stop(player);
-%      play(player);
-%    endif
+    if (!isplaying(player))
+      stop(player);
+      play(player);
+    endif
 
 % check climbing, falling potential; change if necessary
     if (abs(climbRoute1 - bigFootX) < climbRouteRadius )
@@ -98,6 +108,10 @@ function game
 % check for background change? if yes change to cave, reset change to false, and reset characters. if already in cave, activate win condition
     if (change == true)
       if (changeTimes == 2)
+        [signal2, sampleRate2] = audioread('medieval_fanfare.wav');
+        player2 = audioplayer(signal2,sampleRate2);
+        stop(player);
+        play(player2);
         text(500, 500,"You Won!!!",'FontSize', 50,'Color',[1 0 0]);
         pause(5);
         break;
@@ -114,6 +128,7 @@ function game
       climbRoute2 = 1375;
       climbRoute3 = -500;
       climbRouteMaxHeight = 420;
+      dragonPresent = true;
     endif
 
 % rotate the bat
@@ -182,7 +197,7 @@ function game
       bfThet += bigFootTheta;
     elseif( cmd == 'x' && bigFootOnGround ) %jump vertically
       bigFootFalling = 1;
-      bigFootY = bigFootY - 40*rand*bigFootSpeed;
+      bigFootY = bigFootY - 20*rand*bigFootSpeed;
     elseif( cmd == 'x' && bigFootOnGround == false ) % leap sideways
       bigFootFalling = 1;
       if (lastcom == 'a')
@@ -191,7 +206,6 @@ function game
         bigFootX = bigFootX + 240;
       endif
       bigFootY = bigFootY - rand*bigFootSpeed;
-
       cmd = "null";
     else
       cmd = "null";
@@ -201,11 +215,18 @@ function game
     batHandle = drawBat(batSize,batColor,lineWidth,batPose,batX,batY,rcheck,thet);
 % draw bigfoot.
     bigFootHandle = drawBigFoot(batSize,bigFootPose,"red",bigFootX,bigFootY,bfThet);
+% draw the dragon!
+    if (dragonPresent)
+      dragonHandle = drawDragon(dragonSize, dragonColor, dragonX, dragonY, dragonRot, dragonThet);
+    endif
 % break between frames.
     pause(dt);
 % clear characters for next frame.
     delete(batHandle);
     delete(bigFootHandle);
+    if (dragonPresent)
+      delete(dragonHandle);
+    endif
 % up frame counters
     usedframes = usedframes + 1;
     frames = frames + 1;
