@@ -52,6 +52,18 @@ function game
   bigFootFalling = 0;
   bigFootHealth = 100;
 
+% fire init variables
+  fireActive = false;
+  fireX = 0;
+  fireY = 0;
+  fireSize = 30;
+  fireSpeed = 225; % 5x bigFootSpeed
+  fireSpawnInterval = 5; % seconds
+  fireMaxDuration = 4; % seconds
+  fireSpawnTimer = fireSpawnInterval;
+  fireTimer = 0;
+  fireHandles = [];
+
 % initialize climbing routes. these will change based on location
   climbRoute1 = 475;
   climbRoute2 = 1270;
@@ -73,6 +85,10 @@ function game
   usedframes = 1;
   rcheck = true;
   thet = (-pi/2);
+
+% dragon head position (for fire spawning)
+  dragonHeadX = 1420;
+  dragonHeadY = 120;
 
 % main loop. 'k' to quit while running
   while (cmd != 'k')
@@ -142,6 +158,8 @@ function game
       climbRoute3 = -500;
       climbRouteMaxHeight = 420;
       dragonPresent = true;
+      fireActive = false;
+      fireSpawnTimer = fireSpawnInterval;
     endif
 
 % rotate the bat
@@ -184,6 +202,55 @@ function game
     else
       batX=batX + batSpeed;
       batY=batY + batSpeed;
+    endif
+
+% fire spawning and update logic
+    if (dragonPresent)
+      fireSpawnTimer += dt;
+      if (fireSpawnTimer >= fireSpawnInterval && !fireActive)
+        fireActive = true;
+        fireX = dragonHeadX + (rand - 0.5) * 20; % small randomness
+        fireY = dragonHeadY + (rand - 0.5) * 20;
+        fireTimer = 0;
+        fireSpawnTimer = 0;
+        [signal3, sampleRate3] = audioread('dragon_roar.wav');
+        player3 = audioplayer(signal3,sampleRate3);
+        play(player3);
+      endif
+
+      if (fireActive)
+        fireTimer += dt;
+        if (fireTimer > fireMaxDuration)
+          fireActive = false;
+          if (!isempty(fireHandles))
+            for h = fireHandles
+              delete(h);
+            endfor
+            fireHandles = [];
+          endif
+        else
+          % move fire toward bigFoot
+          dx = bigFootX - fireX;
+          dy = bigFootY - fireY;
+          distance = sqrt(dx^2 + dy^2);
+          if (distance > 0)
+            fireX += (dx / distance) * fireSpeed * dt;
+            fireY += (dy / distance) * fireSpeed * dt;
+          endif
+
+          % check collision with bigFoot (100px hit radius)
+          if (sqrt((fireX - bigFootX)^2 + (fireY - bigFootY)^2) < 100)
+            bigFootHealth -= 25;
+            fireActive = false;
+            if (!isempty(fireHandles))
+              for h = fireHandles
+                delete(h);
+              endfor
+              fireHandles = [];
+            endif
+          endif
+        endif
+      endif
     endif
 % check keyboard cmd (global variable). WASD normal movement; Q/E for rotation.
     if (cmd == "w")
@@ -319,13 +386,28 @@ function game
         fireQueue(idx) = [];
       endfor
     endif
+% draw fire if active
+    if (fireActive)
+      fireHandles = fireMotion(fireSize, fireX, fireY, bigFootX, bigFootY, fireSpeed);
+    endif
+% display health
+    hold on
+    texthandle = text(50, 50, sprintf('Health: %d', bigFootHealth), 'FontSize', 16, 'Color', [1 0 0]);
+    hold off
 % break between frames.
     pause(dt);
 % clear characters for next frame.
     delete(batHandle);
     delete(bigFootHandle);
+    delete(texthandle);
     if (dragonPresent)
       delete(dragonHandle);
+    endif
+    if (fireActive && !isempty(fireHandles))
+      for h = fireHandles
+        delete(h);
+      endfor
+      fireHandles = [];
     endif
 % up frame counters
     usedframes = usedframes + 1;
@@ -336,6 +418,15 @@ function game
       changeTimes += 1;
     elseif bigFootHealth <= 0
       changeTimes = 3
+    endif
+    if (bigFootHealth <= 0)
+      stop(player);
+      [signal4, sampleRate4] = audioread('bacon_sizzle.wav');
+      player4= audioplayer(signal4,sampleRate4);
+      play(player4);
+      text(500, 500,"Game Over",'FontSize', 50,'Color',[1 0 0]);
+      pause(5);
+      break;
     endif
   endwhile
   clf();
