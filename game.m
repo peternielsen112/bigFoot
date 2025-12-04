@@ -3,36 +3,36 @@ function game
 
 % using global variable cmd to connect with keyboard listener
   global cmd;
-  cmd = "null";
-% initialize variable to hold most recent keyboard command.
-  lastcom = 'null';
+  cmd = "null"; % current keyboard command.
+  lastcom = 'null'; % most recent keyboard command.
 
 % frames per second. increase or decrease by powers of 2
   fps = 8;
   dt = 1/fps;
 
-% dragon init variables
+% dragon variables
   dragonSize = 50;
   dragonColor = [0, 0.5, 0];
   dragonX = 1420;
   dragonY = 120;
   dragonRot = true;
-  dragonThet = pi/2; % initial rotation angle
+  dragonThet = pi/2; % init. rotation angle
   dragonPresent = false;
 
-% bat init variables
+% bat variables
   batSize = 40;
   batColor = [0.2, 0, 0.8];
   lineWidth = 3;
   batX = 750;
   batY = 200;
   batSpeed = 25;
-  batAngularSpeed = pi/2; % in radians/sec
+  batAngularSpeed = pi/2; % radians/sec
 
-% init frame number for counting.
+% frame counters
   frames = 0;
+  usedframes = 1;
 
-% bigfoot init variables
+% bigfoot variables
   bigFootX = 750;
   bigFootY = 900;
   bigFootPose = 0;
@@ -43,14 +43,14 @@ function game
   bigFootFalling = 0;
   bigFootHealth = 100;
 
-% fire init variables
+% fire variables
   fireActive = false;
   fireX = 0;
   fireY = 0;
   fireSize = 30;
-  fireSpeed = 225; % 5x bigFootSpeed
-  fireSpawnInterval = 5; % seconds
-  fireMaxDuration = 4; % seconds
+  fireSpeed = 225;
+  fireSpawnInterval = 5; % sec
+  fireMaxDuration = 4; % sec
   fireSpawnTimer = fireSpawnInterval;
   fireTimer = 0;
   fireHandles = [];
@@ -62,22 +62,21 @@ function game
   climbRouteRadius = 50;
   climbRouteMaxHeight = 4*batSize;
 
-% see if this works - play music!
+% bg music
   [signal, sampleRate] = audioread('spooky_forest_bat.wav');
   player = audioplayer(signal,sampleRate);
   play(player);
 
-% background/scene change init
+% bg vars
   [imageHeight,imageWidth] = drawBackground("spookyForest.png");
   change = false;
   changeTimes = 0;
 
-% frame counter for circular bat rotation; rotation variables
-  usedframes = 1;
+% rotation vars
   rcheck = true;
   thet = (-pi/2);
 
-% dragon head position (for fire spawning)
+% dragon head coords for fire
   dragonHeadX = 1420;
   dragonHeadY = 120;
 
@@ -149,10 +148,10 @@ function game
       fireSpawnTimer = fireSpawnInterval;
     endif
 
-% rotate the bat
+% rotate bat
     thet = thet + batAngularSpeed*dt;
 
-% check if bat out of bounds and move bat randomly.
+% bat movement + bounds check
     if (batX >= 1400)
       batX=batX - (2 * (rand > 0.5)*batSpeed);
     elseif (batX <= 145)
@@ -191,12 +190,12 @@ function game
       batY=batY + batSpeed;
     endif
 
-% fire spawning and update logic
+% fire logic
     if (dragonPresent)
       fireSpawnTimer += dt;
       if (fireSpawnTimer >= fireSpawnInterval && !fireActive)
         fireActive = true;
-        fireX = dragonHeadX + (rand - 0.5) * 20; % small randomness
+        fireX = dragonHeadX + (rand - 0.5) * 20;
         fireY = dragonHeadY + (rand - 0.5) * 20;
         fireTimer = 0;
         fireSpawnTimer = 0;
@@ -239,7 +238,7 @@ function game
         endif
       endif
     endif
-% check keyboard cmd (global variable). WASD normal movement; Q/E for rotation.
+% check keyboard cmd. WASD normal movement; Q/E for rotation.
     if (cmd == "w")
       bigFootY -= bigFootSpeed;
       cmd = "null";

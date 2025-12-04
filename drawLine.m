@@ -1,4 +1,4 @@
-function handle = drawLine (p, q, color, width)
+function handle = drawLine (p, q, color, width) % from canvas
   % This function draws a line between two points p and q in homogeneous coordinates.
   % extract x coord from points
   x = [p(1) ; q(1)];

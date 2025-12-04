@@ -21,10 +21,10 @@ function fireHandles = fireMotion(fireSize, fireX, fireY, targetX, targetY, fire
   perp_x = -dir_y;
   perp_y = dir_x;
   
-  % amplitude and frequency of wiggle
+  % amp & freq of wiggle
   wiggle_amplitude = fireSize * 0.4;
   wiggle_frequency = 8 * pi;
-  time_offset = mod(fireX + fireY, 1.0); % Use position as pseudo-time for wiggle
+  time_offset = mod(fireX + fireY, 1.0);
   wiggle_offset = wiggle_amplitude * sin(wiggle_frequency * time_offset);
   
   % Current position of lead fire ball
@@ -43,8 +43,8 @@ function fireHandles = fireMotion(fireSize, fireX, fireY, targetX, targetY, fire
   
   % Draw fireballs
   hold on
-  fire_color_1 = [1, 0.4, 0]; % Orange
-  fire_color_2 = [1, 0.2, 0]; % Red
+  fire_color_1 = [1, 0.4, 0]; % orange
+  fire_color_2 = [1, 0.2, 0]; % red
   fire_color_3 = [1, 0.1, 0]; % more red
   
   handle1 = drawFilledCircle(ball1_x, ball1_y, ball1_radius, fire_color_1, 1);
@@ -52,7 +52,6 @@ function fireHandles = fireMotion(fireSize, fireX, fireY, targetX, targetY, fire
   handle3 = drawFilledCircle(ball3_x, ball3_y, ball3_radius, fire_color_3, 1);
   
   hold off
-  
-  % Return all handles
+
   fireHandles = [handle1, handle2, handle3];
 endfunction

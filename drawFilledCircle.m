@@ -2,7 +2,7 @@ function handle = drawFilledCircle (x_center, y_center, radius, color, width)
   theta = linspace(0, 2*pi, 360);
   x_coords = radius * cos(theta) + x_center;
   y_coords = radius * sin(theta) + y_center;
-  % draw filled circle (patch)
+  % draw filled circle
   hold on
   handle = fill(x_coords, y_coords, color);
   hold off

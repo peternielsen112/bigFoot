@@ -1,6 +1,5 @@
-function keyPress(src, event)
+function keyPress(src, event) % from Canvas
   global cmd;
 
   cmd = event.Key;
 endfunction
-

@@ -1,7 +1,6 @@
 function bigFoot = getBigFoot(bigFootSize,bigFootPose)
   bigFoot = zeros(3,14);
 
-
   if (bigFootPose == 0)
     % body centerpoint
     bigFoot(:,1)=[0;0;1];

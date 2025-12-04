@@ -1,4 +1,4 @@
-function [imageHeight,imageWidth] = drawBackground (imageName)
+function [imageHeight,imageWidth] = drawBackground (imageName) % From canvas
 
   % remove all figures
   clf;

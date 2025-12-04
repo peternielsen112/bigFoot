@@ -32,8 +32,6 @@ function batHandle = drawBat(batSize, batColor, width, batPose,x,y,rot,thet)
   p14=bat(:,14);
   p15=bat(:,15);
 
-
-
   % fill body
   hold on
   bodyX = [p2(1), p3(1), p4(1)];
@@ -71,7 +69,6 @@ function batHandle = drawBat(batSize, batColor, width, batPose,x,y,rot,thet)
   handle5 = fill(ear2x,ear2y, batColor);
   hold off
 
-%  batHandle = [fill(bodyX, bodyY, batColor),fill(wing1x, wing1y, batColor),fill(wing2x, wing2y, batColor),fill(ear1x,ear1y, batColor),fill(ear2x,ear2y, batColor)];
   batHandle = [handle1, handle2, handle3, handle4, handle5];
 
 endfunction

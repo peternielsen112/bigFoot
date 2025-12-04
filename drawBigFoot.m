@@ -1,5 +1,3 @@
-
-% create function bigFootHandle
 function bigFootHandle = drawBigFoot(bigFootSize,bigFootPose,bigFootColor,x,y,thet)
   bigFoot = getBigFoot(bigFootSize,bigFootPose);
 

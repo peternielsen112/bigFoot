@@ -69,7 +69,7 @@ Catch Batty twice - once in the forest, once in the cave - and don't get too bur
 ![Fire](./ss4.png "fire")
 
 ### Known Issues
-As of release RELEASE NUMBER, the known issues are as follows.
+As of the latest release, the known issues are as follows.
 - **Audioplayer bug:** if the device's sound output device changes while the Octave GUI is running, it has the potential to prevent the game from starting. **Workaround:** restart the Octave GUI. ![Static Badge](https://img.shields.io/badge/Device:-Mac-blue) ![Static Badge](https://img.shields.io/badge/Affects_Play-Yes-red)
 - **Warnings on Game Exit:** When quitting the game with `k` (and occasionally on the win/lose conditions), the Octave terminal will return a warning message about the music player. **Workaround:** This could probably be remedied by adding code towards the end of [game.m](./game.m) to stop all audio players before quitting the game. ![Static Badge](https://img.shields.io/badge/Device:-Mac_/_PC-purple) ![Static Badge](https://img.shields.io/badge/Affects_Play-No-Green)
 
