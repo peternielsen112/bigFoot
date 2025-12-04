@@ -21,11 +21,11 @@ function game
   dragonPresent = false;
   
 % fire init variables
-  fireSpawnInterval = 7.5; % spawn fire every 7.5 seconds
-  fireLifespan = 5; % fire lives for 5 seconds
+  fireSpawnInterval = 7.5;
+  fireLifespan = 5;
   fireSpawnTimer = 0;
   fireSize = 20;
-  fireQueue = {}; % queue of active fire projectiles [fireHandle, spawnTime]
+  fireQueue = {}; % queue of active fire projectiles [fireHandle, spawnTime]. a little complex but works fine.
 
 % bat init variables
   batSize = 40;
@@ -44,6 +44,8 @@ function game
   bigFootY = 900;
   bigFootPose = 0;
   bigFootSpeed = 15;
+  % projectile speed for fire (slightly faster than BigFoot)
+  fireSpeed = bigFootSpeed * 1.2;
   bigFootTheta = pi/6;
   bfThet = 0;
   bigFootOnGround = 1;
@@ -121,6 +123,10 @@ function game
         play(player2);
         text(500, 500,"You Won!!!",'FontSize', 50,'Color',[1 0 0]);
         pause(5);
+        break;
+      elseif (changeTimes == 3)
+        stop(player);
+        text(500, 500,"You LOSE!!",'FontSize', 50,'Color',[1 1 0]);
         break;
       endif
       [imageHeight,imageWidth] = drawBackground("cave.png");
@@ -226,62 +232,88 @@ function game
     if (dragonPresent)
       dragonHandle = drawDragon(dragonSize, dragonColor, dragonX, dragonY, dragonRot, dragonThet);
       
-      % Update fire spawn timer
+      % update fire spawn timer
       fireSpawnTimer = fireSpawnTimer + dt;
       
-      % Spawn new fire if timer exceeds interval
+      % makiing some fire here
       if (fireSpawnTimer >= fireSpawnInterval)
         % Fire spawn position
         fireSpawnX = 1420;
         fireSpawnY = 215;
         
-        % Create new fire projectile with metadata
-        fireQueue{end+1} = {fireSpawnX, fireSpawnY, frames};
+        % make fire! store target snapshot so projectile speed is consistent
+        fireQueue{end+1} = {fireSpawnX, fireSpawnY, frames, bigFootX, bigFootY};
+        % play dragon roar sound when spawning fire (reduced volume)
+        [signal3, sampleRate3] = audioread('dragon_roar.wav');
+        % reduce volume to 40%
+        signal3 = 0.4 * signal3;
+        player3 = audioplayer(signal3,sampleRate3);
+        play(player3);
         fireSpawnTimer = 0;
       endif
       
-      % Delete previous frame's fire handles
+      % Delete previous frame's fire handles (stops bleed)
       for fireIdx = 1:length(fireQueue)
-        if (length(fireQueue{fireIdx}) > 3)
-          delete(fireQueue{fireIdx}{4});
+        if (length(fireQueue{fireIdx}) > 5)
+          delete(fireQueue{fireIdx}{6});
         endif
       endfor
       
-      % Update and draw active fire projectiles
+      % update fire
       fireIndicesToRemove = [];
       for fireIdx = 1:length(fireQueue)
         fireData = fireQueue{fireIdx};
         fireSpawnX = fireData{1};
         fireSpawnY = fireData{2};
         fireSpawnFrame = fireData{3};
-        
-        % Calculate progress (0 to 1 over fireLifespan seconds)
+        targetX = fireData{4};
+        targetY = fireData{5};
+
+        % Determine travel progress based on consistent speed (stored target)
+        dx_tot = targetX - fireSpawnX;
+        dy_tot = targetY - fireSpawnY;
+        totalDist = sqrt(dx_tot^2 + dy_tot^2);
         fireAge = (frames - fireSpawnFrame) * dt;
-        fireProgress = fireAge / fireLifespan;
-        
-        % Draw fire if still alive
+        if (totalDist > 0)
+          travelTime = totalDist / fireSpeed;
+          fireProgress = min(1, fireAge / travelTime);
+        else
+          fireProgress = 1;
+        endif
+
+        % draw fire again
         if (fireProgress <= 1)
-          fireHandle = fireMotion(fireSize, fireSpawnX, fireSpawnY, bigFootX, bigFootY, fireProgress);
-          fireQueue{fireIdx}{4} = fireHandle; % Store handle for deletion
-          
-          % Check collision with BigFoot (forgiving hitbox ~100 pixel radius)
-          fireCollisionRadius = 100;
-          dx = fireSpawnX - bigFootX;
-          dy = fireSpawnY - bigFootY;
-          distance = sqrt(dx^2 + dy^2);
-          
-          if (distance < fireCollisionRadius)
-            % Fire hit BigFoot - deal damage and mark for removal
-            bigFootHealth = bigFootHealth * 0.9; % Reduce health by 10%
+          fireHandle = fireMotion(fireSize, fireSpawnX, fireSpawnY, targetX, targetY, fireProgress);
+          fireQueue{fireIdx}{6} = fireHandle; % Store handle for deletion
+
+          % compute current projectile position (along stored path)
+          if (totalDist > 0)
+            dir_x = dx_tot / totalDist;
+            dir_y = dy_tot / totalDist;
+            currDist = totalDist * fireProgress;
+            currX = fireSpawnX + dir_x * currDist;
+            currY = fireSpawnY + dir_y * currDist;
+          else
+            currX = fireSpawnX;
+            currY = fireSpawnY;
+          endif
+
+          % collision check using current projectile position
+          fireCollisionRadius = 150;
+          dxc = currX - bigFootX;
+          dyc = currY - bigFootY;
+          distanceToBF = sqrt(dxc^2 + dyc^2);
+
+          if (distanceToBF < fireCollisionRadius)
+            bigFootHealth = bigFootHealth - 25;
+            % play sizzle sound on hit (left as-is elsewhere if desired)
             fireIndicesToRemove = [fireIndicesToRemove, fireIdx];
           endif
         else
-          % Mark for removal
           fireIndicesToRemove = [fireIndicesToRemove, fireIdx];
         endif
       endfor
-      
-      % Remove expired fire projectiles
+      % remove bad fire
       for i = length(fireIndicesToRemove):-1:1
         idx = fireIndicesToRemove(i);
         fireQueue(idx) = [];
@@ -302,6 +334,8 @@ function game
     if (batX <= bigFootX+50) && (batX >=bigFootX-50) && (batY <= bigFootY+50) && (batY >= bigFootY-50)
       change = true;
       changeTimes += 1;
+    elseif bigFootHealth <= 0
+      changeTimes = 3
     endif
   endwhile
   clf();
