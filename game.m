@@ -19,6 +19,13 @@ function game
   dragonRot = true;
   dragonThet = pi/2; % initial rotation angle
   dragonPresent = false;
+  
+% fire init variables
+  fireSpawnInterval = 7.5; % spawn fire every 7.5 seconds
+  fireLifespan = 5; % fire lives for 5 seconds
+  fireSpawnTimer = 0;
+  fireSize = 20;
+  fireQueue = {}; % queue of active fire projectiles [fireHandle, spawnTime]
 
 % bat init variables
   batSize = 40;
@@ -218,6 +225,67 @@ function game
 % draw the dragon!
     if (dragonPresent)
       dragonHandle = drawDragon(dragonSize, dragonColor, dragonX, dragonY, dragonRot, dragonThet);
+      
+      % Update fire spawn timer
+      fireSpawnTimer = fireSpawnTimer + dt;
+      
+      % Spawn new fire if timer exceeds interval
+      if (fireSpawnTimer >= fireSpawnInterval)
+        % Fire spawn position
+        fireSpawnX = 1420;
+        fireSpawnY = 215;
+        
+        % Create new fire projectile with metadata
+        fireQueue{end+1} = {fireSpawnX, fireSpawnY, frames};
+        fireSpawnTimer = 0;
+      endif
+      
+      % Delete previous frame's fire handles
+      for fireIdx = 1:length(fireQueue)
+        if (length(fireQueue{fireIdx}) > 3)
+          delete(fireQueue{fireIdx}{4});
+        endif
+      endfor
+      
+      % Update and draw active fire projectiles
+      fireIndicesToRemove = [];
+      for fireIdx = 1:length(fireQueue)
+        fireData = fireQueue{fireIdx};
+        fireSpawnX = fireData{1};
+        fireSpawnY = fireData{2};
+        fireSpawnFrame = fireData{3};
+        
+        % Calculate progress (0 to 1 over fireLifespan seconds)
+        fireAge = (frames - fireSpawnFrame) * dt;
+        fireProgress = fireAge / fireLifespan;
+        
+        % Draw fire if still alive
+        if (fireProgress <= 1)
+          fireHandle = fireMotion(fireSize, fireSpawnX, fireSpawnY, bigFootX, bigFootY, fireProgress);
+          fireQueue{fireIdx}{4} = fireHandle; % Store handle for deletion
+          
+          % Check collision with BigFoot (forgiving hitbox ~100 pixel radius)
+          fireCollisionRadius = 100;
+          dx = fireSpawnX - bigFootX;
+          dy = fireSpawnY - bigFootY;
+          distance = sqrt(dx^2 + dy^2);
+          
+          if (distance < fireCollisionRadius)
+            % Fire hit BigFoot - deal damage and mark for removal
+            bigFootHealth = bigFootHealth * 0.9; % Reduce health by 10%
+            fireIndicesToRemove = [fireIndicesToRemove, fireIdx];
+          endif
+        else
+          % Mark for removal
+          fireIndicesToRemove = [fireIndicesToRemove, fireIdx];
+        endif
+      endfor
+      
+      % Remove expired fire projectiles
+      for i = length(fireIndicesToRemove):-1:1
+        idx = fireIndicesToRemove(i);
+        fireQueue(idx) = [];
+      endfor
     endif
 % break between frames.
     pause(dt);
