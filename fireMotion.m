@@ -29,23 +29,20 @@ function fireHandles = fireMotion(fireSize, fireStartX, fireStartY, targetX, tar
     dir_y = 0;
   endif
   
-  % Calculate perpendicular direction for wiggle (rotate 90 degrees)
+  % wiggle direction
   perp_x = -dir_y;
   perp_y = dir_x;
   
-  % Wiggle amplitude and frequency
+  % amplitude, frequency of wiggle. cool, right?
   wiggle_amplitude = fireSize * 0.4;
-  wiggle_frequency = 8 * pi;  % Number of wiggles during motion
-  
-  % Calculate wiggle offset (sinusoidal based on progress)
+  wiggle_frequency = 8 * pi;
   wiggle_offset = wiggle_amplitude * sin(wiggle_frequency * progress);
   
-  % Calculate current position along path with wiggle
   current_distance = distance * progress;
   current_x = fireStartX + dir_x * current_distance + perp_x * wiggle_offset;
   current_y = fireStartY + dir_y * current_distance + perp_y * wiggle_offset;
   
-  % Position of fire balls in a chain (separated by their radii)
+  % Position of fireballs
   ball1_x = current_x;
   ball1_y = current_y;
   
@@ -55,11 +52,11 @@ function fireHandles = fireMotion(fireSize, fireStartX, fireStartY, targetX, tar
   ball3_x = ball2_x - dir_x * (ball2_radius + ball3_radius);
   ball3_y = ball2_y - dir_y * (ball2_radius + ball3_radius);
   
-  % Draw fire balls (red color with slight variation)
+  % Draw fireballs
   hold on
-  fire_color_1 = [1, 0.4, 0];       % Orange-red
-  fire_color_2 = [1, 0.2, 0];       % Red
-  fire_color_3 = [1, 0.1, 0];       % Deep red
+  fire_color_1 = [1, 0.4, 0]; % Orange
+  fire_color_2 = [1, 0.2, 0]; % Red
+  fire_color_3 = [1, 0.1, 0]; % more red
   
   handle1 = drawFilledCircle(ball1_x, ball1_y, ball1_radius, fire_color_1, 1);
   handle2 = drawFilledCircle(ball2_x, ball2_y, ball2_radius, fire_color_2, 1);
