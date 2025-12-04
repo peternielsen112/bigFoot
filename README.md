@@ -8,7 +8,7 @@
 
 
 ### About
-BigFoot is a student project for CS100 @ Cal Poly Humboldt. This is my iteration of the BigFoot game. Licensed under [LICENSE]
+BigFoot is a student project for CS100 @ Cal Poly Humboldt. This is my iteration of the BigFoot game. Licensed under [Creative Commons](./LICENSE).
 
 Contact Info: [peternielsen112](https://github.com/peternielsen112) on GitHub; [pan25@humboldt.edu](mailto:pan25@humboldt.edu).
 
